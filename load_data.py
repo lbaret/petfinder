@@ -23,4 +23,6 @@ print(correlation)
 
 correlation = df.corr(method='pearson')
 print(correlation)
-# TODO : Créer le filtre avec deux seuils.
+# Pour seuiller les valeurs : on utilise la fonction where comme pour une bdd
+correlated = correlation.where((correlation > 0.5) | (correlation < -0.5))
+# TODO : Récupérer les valeurs d'index et de colonnes pour des variables corrélées
