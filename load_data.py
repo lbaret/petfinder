@@ -1,28 +1,20 @@
 import pandas as pd
 import os
 
-train_path = os.path.abspath(os.path.dirname(__name__)) + '\\petfinder-adoption-prediction\\train\\train.csv'
 
-# Lecture du fichier des données d'entrainement
-df = pd.read_csv(train_path, sep=',')
+class Data:
+    def __init__(self, train_path=None):
+        self.train_path = train_path if train_path else os.path.abspath(os.path.dirname(__name__)) + '\\petfinder-adoption-prediction\\train\\train.csv'
+        # Lecture du fichier des données d'entrainement
+        self.df = pd.read_csv(self.train_path, sep=',')
+        self.columns_names = self.df.columns.values.tolist()
 
-# On récupère les noms de colonnes
-columns_names = list(df.columns.values)
-print(columns_names)
+    def get_description(self):
+        return self.df['Description'].tolist()
 
-"""
-    À la simple vision des noms de colonnes on peut très vite s'orienter vers un calcul de corrélations avec la rapidité d'adoption :
-        - Vaccinated
-        - Dewormed
-"""
+    def show_columns_names(self):
+        print(self.columns_names)
 
-df_bis = df[['Vaccinated', 'Dewormed', 'AdoptionSpeed']]
-correlation = df_bis.corr(method='pearson')
-print(correlation)
-# On peut également faire toutes les données et filtrer les valeurs
-
-correlation = df.corr(method='pearson')
-print(correlation)
-# Pour seuiller les valeurs : on utilise la fonction where comme pour une bdd
-correlated = correlation.where((correlation > 0.5) | (correlation < -0.5))
-# TODO : Récupérer les valeurs d'index et de colonnes pour des variables corrélées
+if __name__ == '__main__':
+    datas = Data()
+    print("Done.")
