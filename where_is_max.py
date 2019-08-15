@@ -26,17 +26,17 @@ files = glob(data_path + "1/*")
 files += glob(data_path + "0/*")
 
 # Initialisation des variables utiles
-maxH = 0
-maxW = 0
+all_max = []
 total = actual = len(files)
 cnt = 0
 cut = math.ceil(total/nb)
 
 # Fonction pour le traitement
 def checkMax(files, lock):
-    global cnt, maxH, maxW
+    global cnt, all_max
+    maxH = 0
+    maxW = 0
     for f in files:
-        lock.acquire()
         img = Image.open(f)
         w = img.width
         h = img.height
@@ -44,8 +44,10 @@ def checkMax(files, lock):
             maxW = w
         if h > maxH:
             maxH = h
-        cnt += 1
-        lock.release()
+    lock.acquire()
+    all_max.append((maxH, maxW))
+    lock.release()
+
 
 # Traitement
 for i in range(nb):
@@ -66,10 +68,8 @@ for i in range(nb):
     dots = ''
     print("\nTraitement en cours ...")
     loop = True
-    while loop:
-        # Affichage de l'avancement
-        print('\rEffectué : {:%}'.format(cnt/total), end='')
-        loop = areRunning(cnt / total)
+    while len(all_max) < 10:
+        print("\rChargement ... Avancement : {}".format(len(all_max)), end='')
 
     # Fermeture des threads
     for i in range(nb):
