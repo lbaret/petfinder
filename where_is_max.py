@@ -75,5 +75,5 @@ for i in range(nb):
     for i in range(nb):
         threads[i].join()
 
-files = None
-print("\nMax height : {}\nMax width : {}".format(maxH, maxW))
+# files = None
+# print("\nMax height : {}\nMax width : {}".format(maxH, maxW))
