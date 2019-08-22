@@ -21,7 +21,7 @@ def areRunning(pourcentage):
 
 # Variables de chemins d'accès
 root = os.path.abspath(os.path.dirname(__name__))
-data_path = root + "/pixabay/dogs/"
+data_path = root + "/pixabay/cats/"
 files = glob(data_path + "1/*")
 files += glob(data_path + "0/*")
 
@@ -44,6 +44,9 @@ def checkMax(files, lock):
             maxW = w
         if h > maxH:
             maxH = h
+        lock.acquire()
+        cnt += 1
+        lock.release()
     lock.acquire()
     all_max.append((maxH, maxW))
     lock.release()
@@ -54,26 +57,37 @@ for i in range(nb):
     # Calcul des indices de liste
     next = actual - cut
     if next >= 0:
-        min = i * cut
-        max = (i+1) * cut
+        minI = i * cut
+        maxI = (i+1) * cut
     else:
-        min = i * cut
-        max = min + actual
+        minI = i * cut
+        maxI = min + actual
 
     # Création du thread
-    t = threading.Thread(target=checkMax, args=(files[min:max], lock))
+    t = threading.Thread(target=checkMax, args=(files[minI:maxI], lock))
     threads.append(t)
     t.start()
 
-    dots = ''
-    print("\nTraitement en cours ...")
-    loop = True
-    while len(all_max) < 10:
-        print("\rChargement ... Avancement : {}".format(len(all_max)), end='')
+dots = ''
+print("\nTraitement en cours ...")
+while areRunning(cnt/total):
+    print("\rChargement ... Avancement : {:0.2f}%".format(cnt/total*100), end='')
 
-    # Fermeture des threads
-    for i in range(nb):
-        threads[i].join()
+# Fermeture des threads
+for i in range(nb):
+    threads[i].join()
 
-# files = None
-# print("\nMax height : {}\nMax width : {}".format(maxH, maxW))
+files = None
+maxH = max(all_max, key=lambda x: x[0])[0]
+maxW = max(all_max, key=lambda x: x[1])[1]
+print("\nMax height : {}\nMax width : {}".format(maxH, maxW))
+
+"""
+    For dogs :
+    max height = 340
+    max width = 1241
+    
+    For cats :
+    max height = 340
+    max width = 1162
+"""
